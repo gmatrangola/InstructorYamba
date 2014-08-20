@@ -11,4 +11,11 @@
             android:title="Password"
             android:defaultValue="password"/>
     </PreferenceCategory>
+    <PreferenceCategory android:title="Network">
+        <ListPreference android:key="interval"
+            android:title="Interval"
+            android:defaultValue="0"
+            android:entries="@array/intervals"
+            android:entryValues="@array/intervalValues" />
+    </PreferenceCategory>
 </PreferenceScreen>

@@ -18,24 +18,40 @@ public class YambaApp extends Application implements SharedPreferences.OnSharedP
     private static final String TAG = "newcircle.yamba." + YambaApp.class.getSimpleName();
     public static final String USERNAME = "username";
     public static final String PASSWORD = "password";
+    public static final String INTERVAL = "interval";
 
     private YambaClient yambaClient;
     private static YambaApp instance;
+    private PendingIntent refreshPendingIntent;
 
     @Override
     public void onCreate() {
         super.onCreate();
         Log.d(TAG, "onCreate");
         instance = this;
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefs.registerOnSharedPreferenceChangeListener(this);
+
         setupTimer();
     }
 
     private void setupTimer() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        Long interval = Long.valueOf(prefs.getString(INTERVAL, "0"));
+
+        Log.d(TAG, "Setting up alarm with interval " + interval);
         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        Intent refreshIntent = new Intent(this, YambaTimeline.class);
-        PendingIntent pendingIntent = PendingIntent.getService(this, 0, refreshIntent, 0);
-        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, 0,
-                AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendingIntent);
+        if(refreshPendingIntent != null) {
+            alarmManager.cancel(refreshPendingIntent);
+            refreshPendingIntent = null;
+        }
+
+        if(interval > 0 ) {
+            Intent refreshIntent = new Intent(this, YambaTimeline.class);
+            refreshPendingIntent = PendingIntent.getService(this, 0, refreshIntent, 0);
+            alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, 0,
+                    interval, refreshPendingIntent);
+        }
     }
 
     public YambaClient getYambaClient() {
@@ -48,7 +64,6 @@ public class YambaApp extends Application implements SharedPreferences.OnSharedP
                 password != null && password.length() != 0) {
                 yambaClient = new YambaClient(username, password);
             }
-            prefs.registerOnSharedPreferenceChangeListener(this);
         }
         return yambaClient;
     }
@@ -63,6 +78,9 @@ public class YambaApp extends Application implements SharedPreferences.OnSharedP
         Log.d(TAG, "onSharedPreferenceChanged " + key);
         if(key.equals(USERNAME) || key.equals(PASSWORD)) {
             yambaClient = null;
+        }
+        else if(key.equals(INTERVAL)) {
+            setupTimer();
         }
     }
 }
