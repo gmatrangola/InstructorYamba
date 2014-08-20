@@ -5,6 +5,7 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.Context;
+import android.database.Cursor;
 import android.util.Log;
 
 import static com.thenewcircle.instructoryamba.TimelineContract.Columns.*;
@@ -29,15 +30,22 @@ public class YambaTimeline extends IntentService {
             try {
                 List<YambaClient.Status> posts = client.getTimeline(100);
                 final ContentResolver resolver  = getContentResolver();
+                Cursor c = resolver.query(TimelineContract.CONTENT_URI,
+                        TimelineContract.MAX_TIME_CREATED, null, null, null);
+                final long maxTime = c.moveToFirst()?c.getLong(0): Long.MIN_VALUE;
 
 
                 for(YambaClient.Status status : posts) {
                     Log.d(TAG, status.getMessage());
-                    ContentValues values = new ContentValues();
-                    values.put(MESSAGE, status.getMessage());
-                    values.put(TIME_CREATED, status.getCreatedAt().getTime());
-                    values.put(USER, status.getUser());
-                    resolver.insert(TimelineContract.CONTENT_URI, values);
+                    long time = status.getCreatedAt().getTime();
+                    if(time > maxTime) {
+                        ContentValues values = new ContentValues();
+                        values.put(MESSAGE, status.getMessage());
+                        values.put(TIME_CREATED, time);
+                        values.put(USER, status.getUser());
+                        values.put(ID, status.getId());
+                        resolver.insert(TimelineContract.CONTENT_URI, values);
+                    }
                 }
             } catch (YambaClientException e) {
                 Log.e(TAG, "Unable to get timeline", e);

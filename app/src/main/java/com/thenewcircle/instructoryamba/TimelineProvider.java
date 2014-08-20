@@ -6,6 +6,7 @@ import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.util.Log;
 
@@ -59,7 +60,14 @@ public class TimelineProvider extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection,
                         String[] selectionArgs, String sortOrder) {
-        throw new UnsupportedOperationException("Not yet implemented");
+        SQLiteDatabase db = timelineHelper.getReadableDatabase();
+
+        SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
+        qb.setTables(TimelineHelper.TABLE);
+        Cursor c = qb.query(db, projection, selection, selectionArgs, null, null,sortOrder);
+        c.setNotificationUri(getContext().getContentResolver(), uri);
+        return c;
+
     }
 
     @Override
