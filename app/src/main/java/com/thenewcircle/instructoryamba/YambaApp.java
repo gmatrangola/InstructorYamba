@@ -1,6 +1,9 @@
 package com.thenewcircle.instructoryamba;
 
+import android.app.AlarmManager;
 import android.app.Application;
+import android.app.PendingIntent;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -24,6 +27,15 @@ public class YambaApp extends Application implements SharedPreferences.OnSharedP
         super.onCreate();
         Log.d(TAG, "onCreate");
         instance = this;
+        setupTimer();
+    }
+
+    private void setupTimer() {
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        Intent refreshIntent = new Intent(this, YambaTimeline.class);
+        PendingIntent pendingIntent = PendingIntent.getService(this, 0, refreshIntent, 0);
+        alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP, 0,
+                AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendingIntent);
     }
 
     public YambaClient getYambaClient() {
