@@ -29,6 +29,12 @@
             android:name=".YambaTimeline"
             android:exported="false" >
         </service>
+        <provider
+            android:name=".TimelineProvider"
+            android:authorities="com.thenewcircle.yamba.provider"
+            android:enabled="true"
+            android:exported="true" >
+        </provider>
     </application>
 
 </manifest>
