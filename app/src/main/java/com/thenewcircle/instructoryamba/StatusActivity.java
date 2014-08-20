@@ -2,8 +2,11 @@ package com.thenewcircle.instructoryamba;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -24,42 +27,7 @@ public class StatusActivity extends Activity implements TextWatcher {
     private TextView textViewNumLeft;
     private Button buttonPostStats;
     private EditText editTextStatusMessage;
-
-
-    private class PostTask extends AsyncTask<String, Integer, Long> {
-
-        @Override
-        protected Long doInBackground(String... messages) {
-            Log.d(TAG, "doInBackground");
-            long start = System.currentTimeMillis();
-            for(String message : messages) {
-                Log.d(TAG, "sending Message " + message);
-                YambaClient client = new YambaClient("student", "password");
-                try {
-                    client.postStatus(message);
-                    Thread.sleep(10000);
-                } catch (YambaClientException e) {
-                    Log.e(TAG, "Error posting: " + message, e);
-                } catch (InterruptedException e) {
-                    Log.wtf(TAG, "thread error");
-                }
-            }
-
-            return System.currentTimeMillis() - start;
-        }
-
-        @Override
-        protected void onPostExecute(Long aLong) {
-            super.onPostExecute(aLong);
-            Log.d(TAG, "onPostExecute");
-            AlertDialog.Builder builder = new AlertDialog.Builder(StatusActivity.this);
-            builder.setTitle("Posted Message");
-            builder.setMessage("Took " + aLong + " ms");
-            builder.create().show();
-            editTextStatusMessage.getText().clear();
-
-        }
-    }
+    private boolean loggedIn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,8 +44,9 @@ public class StatusActivity extends Activity implements TextWatcher {
             public void onClick(View v) {
                 String message = editTextStatusMessage.getText().toString();
                 Log.d(TAG, "okClick " + message);
-                PostTask postTask = new PostTask();
-                postTask.execute(message);
+                Intent postIntent = new Intent(StatusActivity.this, PostMessageService.class);
+                postIntent.putExtra("message", message);
+                startService(postIntent);
             }
         });
     }
@@ -92,6 +61,12 @@ public class StatusActivity extends Activity implements TextWatcher {
     protected void onResume() {
         super.onResume();
         Log.d(TAG, "onResume");
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        String username = prefs.getString("username", null);
+        String password = prefs.getString("password", null);
+        loggedIn = username != null && password != null;
+        buttonPostStats.setEnabled(loggedIn);
     }
 
     @Override
@@ -131,8 +106,15 @@ public class StatusActivity extends Activity implements TextWatcher {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
+        switch (id) {
+            case R.id.action_settings :
+                Intent settingsIntent = new Intent(this, SettingsActivity.class);
+                startActivity(settingsIntent);
+                return true;
+            case R.id.refresh:
+                Intent refreshIntent = new Intent(this, YambaTimeline.class);
+                startService(refreshIntent);
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -153,7 +135,7 @@ public class StatusActivity extends Activity implements TextWatcher {
         // Log.d(TAG, "afterTextChanged " + numLeft);
         textViewNumLeft.setText(numLeft + "");
         // disable button if message is too large
-        buttonPostStats.setEnabled(numLeft >= 0);
+        buttonPostStats.setEnabled(loggedIn && numLeft >= 0);
 
         if(numLeft < 10) {
             // change text color
