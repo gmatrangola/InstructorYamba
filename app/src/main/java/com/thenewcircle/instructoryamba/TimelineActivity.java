@@ -8,7 +8,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import com.thenewcircle.instructoryamba.R;
 
-public class TimelineActivity extends BaseYambaActivity {
+public class TimelineActivity extends BaseYambaActivity implements TimelineFragment.TimelineItemSelectionCallback {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,4 +42,13 @@ public class TimelineActivity extends BaseYambaActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onTimelineItemSelected(long id) {
+        FragmentTransaction tx = getFragmentManager().beginTransaction();
+        TimelineDetailsFragment detailsFragment = new TimelineDetailsFragment();
+        // Todo set details
+        tx.replace(R.id.fragment_container, detailsFragment);
+        tx.addToBackStack("TimelineDetails " + id);
+        tx.commit();
+    }
 }
