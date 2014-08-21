@@ -2,12 +2,13 @@ package com.thenewcircle.instructoryamba;
 
 import android.app.Activity;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import com.thenewcircle.instructoryamba.R;
 
-public class TimelineActivity extends Activity {
+public class TimelineActivity extends BaseYambaActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,13 +19,12 @@ public class TimelineActivity extends Activity {
         ft.commit();
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.timeline, menu);
+        getMenuInflater().inflate(R.menu.timeline_menu, menu);
 
-        return true;
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -33,9 +33,13 @@ public class TimelineActivity extends Activity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
+        switch (id) {
+            case R.id.showPost :
+                Intent statusIntent = new Intent(this, StatusActivity.class);
+                startActivity(statusIntent);
+                return true;
         }
         return super.onOptionsItemSelected(item);
     }
+
 }
