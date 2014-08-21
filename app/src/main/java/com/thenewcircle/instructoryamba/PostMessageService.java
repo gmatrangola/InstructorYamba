@@ -51,8 +51,9 @@ public class PostMessageService extends IntentService {
                 notification.setSmallIcon(R.drawable.ic_launcher);
                 notification.setContentTitle("Yamba");
                 notification.setContentText("Posted: " + message);
-                Intent statusIntent = new Intent(this, StatusActivity.class);
-                PendingIntent pendingIntent = PendingIntent.getActivity(this, 100, statusIntent, 0);
+                Intent statusIntent = new Intent(this, TimelineActivity.class);
+                PendingIntent pendingIntent = PendingIntent.getActivity(this, 100, statusIntent,
+                        PendingIntent.FLAG_UPDATE_CURRENT);
 
                 notification.setContentIntent(pendingIntent);
                 notificationManager.notify(NOTIFICATION_MESSAGE_POSTED, notification.getNotification());

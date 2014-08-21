@@ -64,6 +64,14 @@ public class TimelineProvider extends ContentProvider {
 
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
         qb.setTables(TimelineHelper.TABLE);
+        switch (URI_MATCHER.match(uri)){
+            case STATUS_DIR:
+                break;
+            case STATUS_ITEM:
+                qb.appendWhere(TimelineContract.Columns.ID + "=" +
+                 uri.getLastPathSegment());
+                break;
+        }
         Cursor c = qb.query(db, projection, selection, selectionArgs, null, null,sortOrder);
         c.setNotificationUri(getContext().getContentResolver(), uri);
         return c;

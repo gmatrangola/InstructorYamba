@@ -6,9 +6,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+
 import com.thenewcircle.instructoryamba.R;
 
 public class TimelineActivity extends BaseYambaActivity implements TimelineFragment.TimelineItemSelectionCallback {
+
+    private TimelineDetailsFragment detailsFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -16,6 +20,11 @@ public class TimelineActivity extends BaseYambaActivity implements TimelineFragm
         setContentView(R.layout.activity_timeline);
         FragmentTransaction ft = getFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_container, new TimelineFragment(), "timeline");
+        View fragmentDetails = findViewById(R.id.fragment_details);
+        if(fragmentDetails != null) {
+            detailsFragment = new TimelineDetailsFragment();
+            ft.replace(R.id.fragment_details, detailsFragment);
+        }
         ft.commit();
     }
 
@@ -44,11 +53,16 @@ public class TimelineActivity extends BaseYambaActivity implements TimelineFragm
 
     @Override
     public void onTimelineItemSelected(long id) {
-        FragmentTransaction tx = getFragmentManager().beginTransaction();
-        TimelineDetailsFragment detailsFragment = new TimelineDetailsFragment();
-        // Todo set details
-        tx.replace(R.id.fragment_container, detailsFragment);
-        tx.addToBackStack("TimelineDetails " + id);
-        tx.commit();
+        if(detailsFragment == null) {
+            FragmentTransaction tx = getFragmentManager().beginTransaction();
+            TimelineDetailsFragment detailsFragment = new TimelineDetailsFragment();
+            detailsFragment.setRowId(id);
+            tx.replace(R.id.fragment_container, detailsFragment);
+            tx.addToBackStack("TimelineDetails " + id);
+            tx.commit();
+        }
+        else {
+            detailsFragment.update(id);
+        }
     }
 }
