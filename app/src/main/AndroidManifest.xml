@@ -3,19 +3,14 @@
     package="com.thenewcircle.instructoryamba" >
 
     <application
+        android:name=".YambaApp"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme"
-        android:name=".YambaApp">
+        android:theme="@style/AppTheme" >
         <activity
             android:name=".StatusActivity"
             android:label="@string/app_name" >
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".SettingsActivity"
@@ -29,17 +24,29 @@
             android:name=".YambaTimeline"
             android:exported="false" >
         </service>
+
         <provider
             android:name=".TimelineProvider"
             android:authorities="com.thenewcircle.yamba.provider"
             android:enabled="true"
             android:exported="true" >
         </provider>
-        <receiver android:name="com.thenewcircle.instructoryamba.OnBoot">
+
+        <receiver android:name=".OnBoot" >
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
+
+        <activity
+            android:name=".TimelineActivity"
+            android:label="@string/title_activity_timeline" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>
