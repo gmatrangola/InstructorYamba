@@ -1,0 +1,36 @@
+Day 5 Review
+
+* Activity
+  * StatusActivity
+  * Layout
+  * Default Intent
+  * Android Manifest
+  * Messaging
+  * Lifecycle
+  * Resources
+     * Color
+     * Strings
+     * Configuration layout-land
+  * Fragments
+* Intents
+  * Default
+  * OnBootCompleted
+  * Pending Intents
+* Client Library
+  * NetworkOnMainThreadException
+  * Async Task
+* Notifications
+* Preferences Activities
+* Shared Prefs
+* Inexact Alarm Manager
+* Services
+  * IntentServices
+  * Threading
+* Application Subclass
+* SQLite
+* Content Providers
+* OpenHelpers
+* List
+  * Adapter / SimpleCursorAdapter
+  * Loader
+

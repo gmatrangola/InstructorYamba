@@ -53,13 +53,23 @@ public class PostMessageService extends IntentService {
                 notification.setContentText("Posted: " + message);
                 Intent statusIntent = new Intent(this, TimelineActivity.class);
                 statusIntent.putExtra("fromNotification", true);
+                Double lat = null;
+                Double lon = null;
+                if(statusIntent.hasExtra("lat")) {
+                    lat = statusIntent.getDoubleExtra("lat", 0);
+                    lon = statusIntent.getDoubleExtra("lon", 0);
+                }
                 PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, statusIntent,
                         PendingIntent.FLAG_UPDATE_CURRENT);
 
                 notification.setContentIntent(pendingIntent);
                 notificationManager.notify(NOTIFICATION_MESSAGE_POSTED, notification.getNotification());
-
-                client.postStatus(message);
+                if(lat != null) {
+                    client.postStatus(message, lat, lon);
+                }
+                else {
+                    client.postStatus(message);
+                }
             } catch (YambaClientException e) {
                 Log.e(TAG, "Error posting: " + message, e);
             }

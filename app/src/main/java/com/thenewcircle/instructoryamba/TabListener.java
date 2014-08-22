@@ -37,6 +37,7 @@ public class TabListener<T extends Fragment> implements ActionBar.TabListener  {
 		else {
 			ft.attach(fragment);
 		}
+        tab.select();
 	}
 
 	@Override
