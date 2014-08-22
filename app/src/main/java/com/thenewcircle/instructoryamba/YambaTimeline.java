@@ -13,6 +13,7 @@ import static com.thenewcircle.instructoryamba.TimelineContract.Columns.*;
 import com.marakana.android.yamba.clientlib.YambaClient;
 import com.marakana.android.yamba.clientlib.YambaClientException;
 
+import java.util.Date;
 import java.util.List;
 
 public class YambaTimeline extends IntentService {
@@ -28,25 +29,44 @@ public class YambaTimeline extends IntentService {
         YambaClient client = YambaApp.getInstance().getYambaClient();
         if(client != null) {
             try {
-                List<YambaClient.Status> posts = client.getTimeline(100);
                 final ContentResolver resolver  = getContentResolver();
                 Cursor c = resolver.query(TimelineContract.CONTENT_URI,
                         TimelineContract.MAX_TIME_CREATED, null, null, null);
                 final long maxTime = c.moveToFirst()?c.getLong(0): Long.MIN_VALUE;
 
-
-                for(YambaClient.Status status : posts) {
-                    Log.d(TAG, status.getMessage());
-                    long time = status.getCreatedAt().getTime();
-                    if(time > maxTime) {
-                        ContentValues values = new ContentValues();
-                        values.put(MESSAGE, status.getMessage());
-                        values.put(TIME_CREATED, time);
-                        values.put(USER, status.getUser());
-                        values.put(ID, status.getId());
-                        resolver.insert(TimelineContract.CONTENT_URI, values);
+                client.fetchFriendsTimeline(new YambaClient.TimelineProcessor() {
+                    @Override
+                    public boolean isRunnable() {
+                        return true;
                     }
-                }
+
+                    @Override
+                    public void onStartProcessingTimeline() {
+
+                    }
+
+                    @Override
+                    public void onEndProcessingTimeline() {
+
+                    }
+
+                    @Override
+                    public void onTimelineStatus(long id, Date createdAt, String user, String msg) {
+                        Log.d(TAG, msg);
+                        long time = createdAt.getTime();
+                        if(time > maxTime) {
+                            ContentValues values = new ContentValues();
+                            values.put(MESSAGE, msg);
+                            values.put(TIME_CREATED, time);
+                            values.put(USER, user);
+                            values.put(ID, id);
+                            resolver.insert(TimelineContract.CONTENT_URI, values);
+                        }
+
+                    }
+                });
+
+
             } catch (YambaClientException e) {
                 Log.e(TAG, "Unable to get timeline", e);
             }
