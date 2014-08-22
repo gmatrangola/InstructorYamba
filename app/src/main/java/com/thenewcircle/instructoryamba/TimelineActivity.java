@@ -15,7 +15,9 @@ import com.thenewcircle.instructoryamba.R;
 public class TimelineActivity extends BaseYambaActivity implements TimelineFragment.TimelineItemSelectionCallback {
 
     private static final String TAG = "newcircle.yamba." + TimelineActivity.class.getSimpleName();
+    public static final String SELECTED_TAB = "selectedTab";
     private TimelineDetailsFragment detailsFragment;
+    private int selectedTab = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +36,7 @@ public class TimelineActivity extends BaseYambaActivity implements TimelineFragm
         ActionBar actionBar = getActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         actionBar.setDisplayShowTitleEnabled(false);
+        if(savedInstanceState != null) selectedTab = savedInstanceState.getInt(SELECTED_TAB, 0);
     }
 
     @Override
@@ -51,12 +54,20 @@ public class TimelineActivity extends BaseYambaActivity implements TimelineFragm
         tab.setText("Status");
         tab.setTabListener(new TabListener<StatusFragment>(this, "status", StatusFragment.class));
         actionBar.addTab(tab);
+        if(selectedTab > -1) actionBar.setSelectedNavigationItem(selectedTab);
     }
 
     @Override
     protected void onPause() {
         getActionBar().removeAllTabs();
         super.onPause();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        int idx = getActionBar().getSelectedNavigationIndex();
+        outState.putInt(SELECTED_TAB, idx);
+        super.onSaveInstanceState(outState);
     }
 
     @Override

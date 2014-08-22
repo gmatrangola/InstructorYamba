@@ -10,6 +10,7 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.app.Fragment;
+import android.os.Handler;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -38,6 +39,7 @@ public class TimelineFragment extends ListFragment implements LoaderManager.Load
             R.id.textViewMessage,
             R.id.textViewTime
     };
+    private Handler handler;
 
     public static interface TimelineItemSelectionCallback {
         public void onTimelineItemSelected(long id);
@@ -65,7 +67,24 @@ public class TimelineFragment extends ListFragment implements LoaderManager.Load
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        handler = new android.os.Handler();
+
         setHasOptionsMenu(true);
+        setRetainInstance(true);
+    }
+
+    private Runnable refresh = new Runnable() {
+        @Override
+        public void run() {
+            adapter.notifyDataSetChanged();
+            handler.postDelayed(refresh, 5000);
+        }
+    };
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        handler.postDelayed(refresh, 5000);
     }
 
     @Override
