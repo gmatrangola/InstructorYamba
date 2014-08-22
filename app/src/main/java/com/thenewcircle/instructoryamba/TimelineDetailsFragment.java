@@ -2,6 +2,7 @@ package com.thenewcircle.instructoryamba;
 
 
 
+import android.app.ActionBar;
 import android.content.ContentUris;
 import android.database.Cursor;
 import android.net.Uri;
@@ -69,4 +70,5 @@ public class TimelineDetailsFragment extends Fragment {
         textViewTime.setText(friendlyTime);
 
     }
+
 }

@@ -51,7 +51,7 @@ public class YambaTimeline extends IntentService {
                     }
 
                     @Override
-                    public void onTimelineStatus(long id, Date createdAt, String user, String msg) {
+                    public void onTimelineStatus(long id, Date createdAt, String user, String msg, Double lat, Double lon) {
                         Log.d(TAG, msg);
                         long time = createdAt.getTime();
                         if(time > maxTime) {
@@ -60,6 +60,9 @@ public class YambaTimeline extends IntentService {
                             values.put(TIME_CREATED, time);
                             values.put(USER, user);
                             values.put(ID, id);
+                            values.put(LAT, lat);
+                            values.put(LON, lon);
+                            Log.d(TAG, "onTimelineStatus LAT = " + lat);
                             resolver.insert(TimelineContract.CONTENT_URI, values);
                         }
 

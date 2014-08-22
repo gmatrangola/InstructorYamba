@@ -18,18 +18,14 @@ public class TimelineActivity extends BaseYambaActivity implements TimelineFragm
     public static final String SELECTED_TAB = "selectedTab";
     private TimelineDetailsFragment detailsFragment;
     private int selectedTab = 0;
+    private View fragmentDetailsView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_timeline);
-        View fragmentDetails = findViewById(R.id.fragment_details);
-        if(fragmentDetails != null) {
-            FragmentTransaction ft = getFragmentManager().beginTransaction();
-            detailsFragment = new TimelineDetailsFragment();
-            ft.replace(R.id.fragment_details, detailsFragment);
-            ft.commit();
-        }
+        fragmentDetailsView = findViewById(R.id.fragment_details);
+        detailsFragment = new TimelineDetailsFragment();
         if(getIntent().getBooleanExtra("fromNotification", false)) {
             Log.d(TAG, "From Notification");
         }
@@ -47,7 +43,7 @@ public class TimelineActivity extends BaseYambaActivity implements TimelineFragm
 
         ActionBar.Tab tab = actionBar.newTab();
         tab.setText("Timeline");
-        tab.setTabListener(new TabListener<TimelineFragment>(this, "timeline", TimelineFragment.class));
+        tab.setTabListener(new TimelineTabListener(this, detailsFragment));
         actionBar.addTab(tab);
 
         tab = actionBar.newTab();
@@ -99,7 +95,7 @@ public class TimelineActivity extends BaseYambaActivity implements TimelineFragm
 
     @Override
     public void onTimelineItemSelected(long id) {
-        if(detailsFragment == null) {
+        if(fragmentDetailsView == null) {
             FragmentTransaction tx = getFragmentManager().beginTransaction();
             TimelineDetailsFragment detailsFragment = new TimelineDetailsFragment();
             detailsFragment.setRowId(id);
@@ -108,7 +104,15 @@ public class TimelineActivity extends BaseYambaActivity implements TimelineFragm
             tx.commit();
         }
         else {
-            detailsFragment.update(id);
+            if(detailsFragment.getActivity() == null) {
+                detailsFragment.setRowId(id);
+                FragmentTransaction ft = getFragmentManager().beginTransaction();
+                ft.replace(R.id.fragment_details, detailsFragment);
+                ft.commit();
+            }
+            else {
+                detailsFragment.update(id);
+            }
         }
     }
 }
