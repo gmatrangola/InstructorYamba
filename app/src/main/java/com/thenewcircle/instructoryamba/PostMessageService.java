@@ -55,9 +55,9 @@ public class PostMessageService extends IntentService {
                 statusIntent.putExtra("fromNotification", true);
                 Double lat = null;
                 Double lon = null;
-                if(statusIntent.hasExtra("lat")) {
-                    lat = statusIntent.getDoubleExtra("lat", 0);
-                    lon = statusIntent.getDoubleExtra("lon", 0);
+                if(intent.hasExtra("lat")) {
+                    lat = intent.getDoubleExtra("lat", 0);
+                    lon = intent.getDoubleExtra("lon", 0);
                 }
                 PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, statusIntent,
                         PendingIntent.FLAG_UPDATE_CURRENT);
