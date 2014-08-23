@@ -55,17 +55,14 @@ public class TimelineActivity extends BaseYambaActivity implements TimelineFragm
 
     @Override
     protected void onPause() {
+        selectedTab = getActionBar().getSelectedNavigationIndex();
         getActionBar().removeAllTabs();
         super.onPause();
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        ActionBar.Tab selected = getActionBar().getSelectedTab();
-        if(selected != null) {
-            int idx = selected.getPosition();
-            outState.putInt(SELECTED_TAB, idx);
-        }
+        outState.putInt(SELECTED_TAB, selectedTab);
 
         super.onSaveInstanceState(outState);
     }
